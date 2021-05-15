@@ -1,10 +1,12 @@
 {
   "name": "vite-plugin-transform",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Vite plugin to handle your resources. For example, to replace occurrences by a regular expression, or resolving paths in cases where the usual tools do not help you, or something else.",
   "main": "index.js",
   "module": "index.js",
-  "files": [ "index.js" ],
+  "files": [
+    "index.js"
+  ],
   "scripts": {
     "test": "node -e \"P=Math,G=console,$='\\n',I=P.max,i=P.min,U=P.round,u=G.log,O=(s,n)=>s.repeat(n),o=y=>y.length,p=(a,A)=>O(' ',U((I(o(a),o(A))-i(o(a),o(A)))/2))+a,X='Hello Friend!'+$,x='Just Trust Me!'+$,h=`[${O('=',I(o(X),o(x)))}]`+$;u(h+p(X,h)+p(x,h)+h);\""
   },
