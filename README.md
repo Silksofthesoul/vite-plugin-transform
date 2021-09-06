@@ -41,8 +41,8 @@ export default defineConfig({
   plugins: [
     vue(),
     transformPlugin({   // add plugin
-      tStart: '%{',     // set opener catch template
-      tEnd:   '}%',     // set closer catch template
+      tStart: '%{',     // set opener capture tag
+      tEnd:   '}%',     // set closer capture tag
       alias,            // enable replace aliases resolver
       replace,          // enable replace by key-value
       exclude,          // exclude file path patterns
@@ -134,7 +134,7 @@ The example is rather contrived and will not work with such a resolving. But may
 The default syntax is: `#{key-word}%`, `#{resolve_aliace}%key-word/#{/end}%`
 
 -   `#{` -- opening capture tag
--   `}%` -- opening capture tag
+-   `}%` -- closer capture tag
 
 You can change default template syntax if add `tStart` and `tEnd` params in configuration:
 
@@ -223,7 +223,7 @@ export default { name: 'AppForMakePeaceAndHappy', };
 
 ## Replace worlds (👎)
 
-For simple word replacement in project files, you can use a plugin with parameters similar to the following in the `vite.config.js` configuration file:
+For ~~simple~~ word replacement in project files, you can use a plugin with parameters similar to the following in the `vite.config.js` configuration file:
 
 ```javascript
 import { defineConfig } from 'vite';
