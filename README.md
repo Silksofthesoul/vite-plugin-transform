@@ -347,8 +347,8 @@ export default {
 
 ## Contribution
 
-I will be glad if you inform me about [bugs][issues], [wishes][issues], or make a [Pull Request][pr].\\
-...Or you can improve this document and correct literary and semantic mistakes that I could have made.\\
+I will be glad if you inform me about [bugs][issues], [wishes][issues], or make a [Pull Request][pr].\
+...Or you can improve this document and correct literary and semantic mistakes that I could have made.\
 Feel free.
 
 [git]: https://github.com/Silksofthesoul/vite-plugin-transform
