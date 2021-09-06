@@ -82,9 +82,7 @@ const transformPlugin = ctx => {
   return {
     name: 'transformPlugin',
     transform: (ctx, id) => {
-      const flag = checkExcludeStatus(id);
-      console.log(flag, id);
-      if(flag) return false;
+      if(checkExcludeStatus(id)) return false;
       return pipe(
         str => str, // no idea!
         ...stdProcessArray(({alias, replace})),
