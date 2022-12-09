@@ -2,6 +2,23 @@
 
 Vite plugin to handle your resources. For example, to replace occurrences by a regular expression, or resolving paths in cases where the usual tools do not help you, or something else.
 
+
+<!-- vim-markdown-toc GFM -->
+
+* [How to use in project:](#how-to-use-in-project)
+* [Resolve path with plugin](#resolve-path-with-plugin)
+* [Syntax](#syntax)
+* [Exclude](#exclude)
+* [Replace worlds (👍)](#replace-worlds-)
+* [Replace worlds (👎)](#replace-worlds--1)
+* [How to process bundle files](#how-to-process-bundle-files)
+* [Examples](#examples)
+* [How it work and How to use it without install plugin](#how-it-work-and-how-to-use-it-without-install-plugin)
+* [Dynamic import of components using path data from a separate source](#dynamic-import-of-components-using-path-data-from-a-separate-source)
+* [Contribution](#contribution)
+
+<!-- vim-markdown-toc -->
+
 ## How to use in project:
 
 Install [npm package][npm] in your project like `devDependencies`:
@@ -245,6 +262,35 @@ export default defineConfig({
 As you can see in the example, we add functions to the `callbackArray` array that take a string and return a string, with your possible data modification already.
 
 However, it is worth noting that the replacement will be made only of those data that will be found in the files, in other words, reactive data, variable values will not be processed. It's pretty obvious, but don't forget about it.
+
+## How to process bundle files
+You may want to treat a file located in the public directory, as well as content that is replaced in the application. To do this, add the "replaceFiles" parameter, the value of which will be an array with the paths of the files you need to change.
+
+Example:
+```javascript
+// vite.config.js
+// see Examples section
+//..
+const replaceFiles = [
+  resolve(join(__dirname, './dist/data.xml')),
+  resolve(join(__dirname, './dist/data-notimported.xml')),
+];
+//..
+export default ({ mode }) => {
+  return defineConfig({
+    plugins: [
+      vue(),
+      XMLLoader(),
+      transformPlugin({ 
+        tStart: '{%', tEnd:   '%}',
+        replaceFiles
+      }),
+    ],
+// ...
+```
+
+## Examples
+Visit the repository with examples: https://github.com/Silksofthesoul/vite-plugin-transform-examples
 
 ## How it work and How to use it without install plugin
 
