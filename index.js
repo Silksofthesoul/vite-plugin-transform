@@ -1,4 +1,4 @@
-const { join } = require('path');
+const { join, resolve } = require('path');
 const fs = require('fs');
 
 const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
@@ -6,8 +6,8 @@ const pipe = (...fns) => (x) => fns.reduce((v, f) => f(v), x);
 let [tStart, tEnd] = ['#\\{', '\\}%'];
 
 const clearAllKey = str => str.replace(new RegExp(`${tStart}.*${tEnd}`), '');
-const { stringify } = JSON;
-const { entries } = Object;
+const { stringify: s=null } = JSON;
+const { entries, keys } = Object;
 
 const objectLength = o => entries(o).length;
 
@@ -15,24 +15,29 @@ const k = ([str], key) => `${tStart}${key ? key : str}${tEnd}`;
 
 const resolveAliases = (str, alias) => {
   // example: #{key-name}%
-  const testKey = (key, str) => new RegExp(k`${key}`, 'igm').test(str);
-
-  const key = 'resolve_aliases';
-  if(alias && objectLength(alias) > 0 && testKey(key, str)) {
+  const key = 'resolve_alias';
+  const re = new RegExp(`${tStart}\s*?${key}\\s*?(.*?)\s*?${tEnd}`, 'igm');
+  const rePathParam = /(path\s*=\s*\\{0,2}["'`])(.*?)(\\{0,2}["'`][\sA-Z]*)/;
+  const reKeyParam = /(key\s*=\s*\\{0,2}["'`])(.*?)(\\{0,2}["'`][\sa-zA-Z]*)/;
+  const qNormalize = str => str.replace(/\\/gim, '\\\\');
+  if(alias && objectLength(alias) > 0 && re.test(str)) {
     // example: #{resolve_alias}%@/your/path#{/end}%
-    const re = new RegExp(`(${(k`${key}`)})(.*)(${(k`\/end`)})`, 'igm');
+    console.log('re: ', re);
     str = str.replace(re, (...f) => {
-      const fk = key => new RegExp(`${key}/`);
-      let findedKey = entries(alias).find(([key]) => fk(key).test(f[2]));
-      if(findedKey) {
-        const base = findedKey[1];
-        const add = f[2].replace(fk(findedKey[0]), '');
-        const path = join(base, add);
-        const ret = stringify(path).replace(/"/gim, '');
+      f.splice(f.length - 1, 1);
+      let base = f[0];
+      console.log('base: ', base);
+      console.log('f: ', f,  'end f');
+        const keyParam = reKeyParam.exec(base);
+        const pathParam = rePathParam.exec(base);
+      console.log('keyParam: ', keyParam)
+      console.log('pathParam: ', pathParam);
+        const valAlias = alias[keyParam[2]];
+        const valPath = pathParam ? pathParam[2] : '';
+      if(!valAlias) return str;
+        const ret = qNormalize(resolve(join(valAlias, valPath)));
+      console.log('ret: ', ret);
         return ret;
-      } else {
-        return ``;
-      }
     });
   }
   return str;

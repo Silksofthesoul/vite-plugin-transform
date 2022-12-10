@@ -9,12 +9,12 @@ Vite plugin to handle your resources. For example, to replace occurrences by a r
 * [Resolve path with plugin](#resolve-path-with-plugin)
 * [Syntax](#syntax)
 * [Exclude](#exclude)
-* [Replace worlds (👍)](#replace-worlds-)
-* [Replace worlds (👎)](#replace-worlds--1)
+* [Replace words](#replace-words)
+* [Replace words alternative](#replace-words-alternative)
 * [How to process bundle files](#how-to-process-bundle-files)
 * [Examples](#examples)
-* [How it work and How to use it without install plugin](#how-it-work-and-how-to-use-it-without-install-plugin)
-* [Dynamic import of components using path data from a separate source](#dynamic-import-of-components-using-path-data-from-a-separate-source)
+* [Difference between versions 1.x.x and 2.x.x](#difference-between-versions-1xx-and-2xx)
+  * [Resolve alias](#resolve-alias)
 * [Contribution](#contribution)
 
 <!-- vim-markdown-toc -->
@@ -41,11 +41,6 @@ const alias = {
   '@':      resolve(__dirname, './src'),
   '@npm':   resolve(__dirname, 'node_modules'),
   '@root':  resolve(__dirname, '../src'),
-  '@stl':   resolve(__dirname, './src/assets/styles'),
-  '@cmp':   resolve(__dirname, './src/components'),
-  '@lib':   resolve(__dirname, './src/library'),
-  '@data':  resolve(__dirname, './src/data'),
-  '@gql':   resolve(__dirname, './src/data/graphql'),
 };
 
 const replace = {
@@ -60,7 +55,7 @@ export default defineConfig({
     transformPlugin({   // add plugin
       tStart: '%{',     // set opener capture tag
       tEnd:   '}%',     // set closer capture tag
-      alias,            // enable replace aliases resolver
+      alias,            // enable replace alias resolver
       replace,          // enable replace by key-value
       exclude,          // exclude file path patterns
       callbackArray: [  // add your functions in this array
@@ -79,39 +74,17 @@ This is a rather strange way of resolving paths, initially I wrote this to dynam
 
 **Example:**
 
-_Suppose this is some data file in which there are paths that we would like to resolve:_
-
-```javascript
-// example.json:
-// ATTENTION: there must be a '/' after the keyword
-// Examples:   #{resolve_aliace}%@/abc#{/end}%
-//             #{resolve_aliace}%@lib/abc#{/end}%
-//             #{resolve_aliace}%@wow/abc#{/end}%
-//
-// Next examples will work incorrect:
-//             #{resolve_aliace}%@#{/end}%/abc
-//             #{resolve_aliace}%@lib#{/end}%/abc
-//             #{resolve_aliace}%@wow#{/end}%/abcmark
-// ...maybe its ugly or silly...
-```
+_Suppose this is some data file in which there are paths that we would like to resolve:  
 
 ```JSON
-[{
-    "name": "Main",
-    "path": "#{resolve_aliace}%@/#{/end}%"
-  },
-  {
-    "name": "About",
-    "path": "#{resolve_aliace}%@/about#{/end}%"
-  },
-  {
-    "name": "UI",
-    "path": "#{resolve_aliace}%@/ui-list#{/end}%"
-  }
+// example.json:
+[
+  { "name": "J", "path": "{%resolve_alias key=\"@root\" path=\"user/jjjj\"%}" },
+  { "name": "{%replace-me%}", "path": "{%resolve_alias key=\"@root\" path=\"user/bbbb\"%}" }
 ]
 ```
 
-Okay. Now let's import this file and see what happens there:
+Okay. Now let's import this file and see what happens there:  
 
 ```javascript
 // example.vue:
@@ -122,16 +95,12 @@ Okay. Now let's import this file and see what happens there:
   <pre>{{ex}}</pre>
   <!--/*[
     {
-      "name": "Main",
-      "path": "X:\\www\\src"
+      "name": "J",
+      "path": "D:\\serverProjects\\test-2022-08-12\\user\\jjjj"
     },
     {
-      "name": "About",
-      "path": "X:\\www\\src\\about"
-    },
-    {
-      "name": "UI",
-      "path": "X:\\www\\src\\ui-list"
+      "name": "abc123",
+      "path": "D:\\serverProjects\\test-2022-08-12\\user\\bbbb"
     }
   ]*/-->
 </template>
@@ -148,7 +117,7 @@ The example is rather contrived and will not work with such a resolving. But may
 
 ## Syntax
 
-The default syntax is: `#{key-word}%`, `#{resolve_aliace}%key-word/#{/end}%`
+The default syntax is: `#{key-word}%`, `#{resolve_alias key="" path=""}%`
 
 -   `#{` -- opening capture tag
 -   `}%` -- closer capture tag
@@ -175,7 +144,8 @@ After this config changes you should use something like this:
 
 ```javascript
   console.log('Hello %{friend}%!');
-  console.log('%{resolve_aliace}%key-word/%{/end}R');
+  console.log('%{resolve_alias path="@" path="aaaa/bbb/sdsd\cfdf/weq\qwe"}');
+  //see Examples section
 ```
 
 ## Exclude
@@ -199,7 +169,7 @@ export default defineConfig({
 });
 ```
 
-## Replace worlds (👍)
+## Replace words
 
 For simple word replacement in project files, add `replace` object with keys and values for replacement:
 
@@ -238,7 +208,7 @@ export default { name: 'AppForMakePeaceAndHappy', };
 </script>
 ```
 
-## Replace worlds (👎)
+## Replace words alternative
 
 For ~~simple~~ word replacement in project files, you can use a plugin with parameters similar to the following in the `vite.config.js` configuration file:
 
@@ -292,104 +262,10 @@ export default ({ mode }) => {
 ## Examples
 Visit the repository with examples: https://github.com/Silksofthesoul/vite-plugin-transform-examples
 
-## How it work and How to use it without install plugin
-
-In fact, you can do without installing this plugin, since `vite` provides good documentation for writing plugins, and the functionality provided is pretty easy to understand.
-
-You can open the source code of this plugin or, even better option would be to familiarize yourself with the source code of the more famous and popular plugin.
-
-After reading the source code, we will understand that a plugin is nothing more than a function that returns an object with properties, one of which is the name of the plugin, and the rest are presented as functions that take some arguments.
-
-For our purposes, most of all, as it seemed to me, was the `transform` property. This is a function that takes a string as input and returns a string.
-
-The minimal plugin looks like this:
-
-```javascript
-// vite.config.js
-import { defineConfig } from 'vite';
-
-const transformPlugin = ctx => {
-  return {
-    name: 'myBeautifulTransformationPlugin',
-    transform: ctx => ctx.replace(/true/gim, 'false')
-  };
-};
-
-export default defineConfig({
-  plugins: [ transformPlugin() ]
-});
-```
-
-## Dynamic import of components using path data from a separate source
-
-If you, like me once, did not find how, for example, to describe routing data in one json file and then use the data from the file for routing and dynamic import and rendering of the menu, then here is the recipe:
-
-```javascript
-// navigation.json:
-// no need use '@' aliaces
-```
-
-```JSON
-[{
-    "name": "Main",
-    "path": "/",
-    "component": "/view/main.vue"
-  },
-  {
-    "name": "About",
-    "path": "/about",
-    "component": "/view/about.vue"
-  },
-  {
-    "name": "UI",
-    "path": "/ui",
-    "component": "/view/ui.vue"
-  }
-]
-```
-
-```javascript
-// router.js
-import {createRouter, createWebHistory} from 'vue-router';
-import navigation from '@/data/navigation.json';
-const routes = navigation.map(({name, path, component}) => {
-  return {
-    name,
-    path,
-    component: () => import(/* @vite-ignore */ component)
-  }
-});
-
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-});
-
-export default router;
-```
-
-```javascript
-// navigation.vue
-<template>
-  <nav>
-    <router-link
-    v-for="(item, index) in navi"
-    :class="$style.naviLink"
-    :key="index"
-    :to="{name: item.name}">
-      {{item.name}}
-    </router-link>
-  </nav>
-</template>
-<script>
-import navi from '@/data/navigation';
-export default {
-  name: 'navigation',
-  data() { return { navi: [] }; },
-  created() { this.navi = navi; }
-};
-</script>
-```
+##  Difference between versions 1.x.x and 2.x.x
+### Resolve alias
+- v1.x.x: #{resolve_aliace}%@lib#{/end}%/abc
+- v2.x.x: #{resolve_alias key="@lib" path="abc"}%
 
 ## Contribution
 
