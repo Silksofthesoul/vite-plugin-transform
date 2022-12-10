@@ -22,22 +22,16 @@ const resolveAliases = (str, alias) => {
   const qNormalize = str => str.replace(/\\/gim, '\\\\');
   if(alias && objectLength(alias) > 0 && re.test(str)) {
     // example: #{resolve-alias key="@" path="aa/bb/cc"}%
-    console.log('re: ', re);
     str = str.replace(re, (...f) => {
       f.splice(f.length - 1, 1);
       let base = f[0];
-      console.log('base: ', base);
-      console.log('f: ', f,  'end f');
-        const keyParam = reKeyParam.exec(base);
-        const pathParam = rePathParam.exec(base);
-      console.log('keyParam: ', keyParam)
-      console.log('pathParam: ', pathParam);
-        const valAlias = alias[keyParam[2]];
-        const valPath = pathParam ? pathParam[2] : '';
+      const keyParam = reKeyParam.exec(base);
+      const pathParam = rePathParam.exec(base);
+      const valAlias = alias[keyParam[2]];
+      const valPath = pathParam ? pathParam[2] : '';
       if(!valAlias) return str;
-        const ret = qNormalize(resolve(join(valAlias, valPath)));
-      console.log('ret: ', ret);
-        return ret;
+      const ret = qNormalize(resolve(join(valAlias, valPath)));
+      return ret;
     });
   }
   return str;
