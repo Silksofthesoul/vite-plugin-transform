@@ -79,8 +79,8 @@ _Suppose this is some data file in which there are paths that we would like to r
 ```JSON
 // example.json:
 [
-  { "name": "J", "path": "{%resolve_alias key=\"@root\" path=\"user/jjjj\"%}" },
-  { "name": "{%replace-me%}", "path": "{%resolve_alias key=\"@root\" path=\"user/bbbb\"%}" }
+  { "name": "J", "path": "{%resolve-alias key=\"@root\" path=\"user/jjjj\"%}" },
+  { "name": "{%replace-me%}", "path": "{%resolve-alias key=\"@root\" path=\"user/bbbb\"%}" }
 ]
 ```
 
@@ -117,7 +117,7 @@ The example is rather contrived and will not work with such a resolving. But may
 
 ## Syntax
 
-The default syntax is: `#{key-word}%`, `#{resolve_alias key="" path=""}%`
+The default syntax is: `#{key-word}%`, `#{resolve-alias key="" path=""}%`
 
 -   `#{` -- opening capture tag
 -   `}%` -- closer capture tag
@@ -144,7 +144,7 @@ After this config changes you should use something like this:
 
 ```javascript
   console.log('Hello %{friend}%!');
-  console.log('%{resolve_alias path="@" path="aaaa/bbb/sdsd\cfdf/weq\qwe"}');
+  console.log('%{resolve-alias path="@" path="aaaa/bbb/sdsd\cfdf/weq\qwe"}');
   //see Examples section
 ```
 
@@ -265,7 +265,7 @@ Visit the repository with examples: https://github.com/Silksofthesoul/vite-plugi
 ##  Difference between versions 1.x.x and 2.x.x
 ### Resolve alias
 - v1.x.x: #{resolve_aliace}%@lib#{/end}%/abc
-- v2.x.x: #{resolve_alias key="@lib" path="abc"}%
+- v2.x.x: #{resolve-alias key="@lib" path="abc"}%
 
 ## Contribution
 

@@ -15,13 +15,13 @@ const k = ([str], key) => `${tStart}${key ? key : str}${tEnd}`;
 
 const resolveAliases = (str, alias) => {
   // example: #{key-name}%
-  const key = 'resolve_alias';
+  const key = 'resolve-alias';
   const re = new RegExp(`${tStart}\s*?${key}\\s*?(.*?)\s*?${tEnd}`, 'igm');
   const rePathParam = /(path\s*=\s*\\{0,2}["'`])(.*?)(\\{0,2}["'`][\sA-Z]*)/;
   const reKeyParam = /(key\s*=\s*\\{0,2}["'`])(.*?)(\\{0,2}["'`][\sa-zA-Z]*)/;
   const qNormalize = str => str.replace(/\\/gim, '\\\\');
   if(alias && objectLength(alias) > 0 && re.test(str)) {
-    // example: #{resolve_alias}%@/your/path#{/end}%
+    // example: #{resolve-alias key="@" path="aa/bb/cc"}%
     console.log('re: ', re);
     str = str.replace(re, (...f) => {
       f.splice(f.length - 1, 1);
